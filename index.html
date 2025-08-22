@@ -1,605 +1,946 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The Great QueueQuest — Wreckathon Edition</title>
-<style>
-  :root{
-    --bg:#0f1115;
-    --panel:#161a22;
-    --muted:#8b93a7;
-    --text:#e9ecf1;
-    --acc:#5b8cff;
-    --bad:#ff6b6b;
-    --ok:#19c37d;
-    --warn:#ffb020;
-  }
-  /* Reset-ish */
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family: Calibri, Arial, Helvetica, sans-serif;
-    line-height:1.5;
-  }
-  .wrap{max-width:900px;margin:0 auto;padding:24px}
-  .card{
-    background:var(--panel);
-    border:1px solid #222838;
-    border-radius:14px;
-    padding:20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  }
-  h1,h2,h3{margin:0 0 10px}
-  h1{font-size:28px}
-  h2{font-size:22px;color:#dbe3ff}
-  p.muted, .muted{color:var(--muted)}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  .field{display:flex;flex-direction:column;gap:6px;flex:1}
-  input, select{
-    background:#0c0f15; color:var(--text); border:1px solid #2a3143;
-    border-radius:10px; padding:12px 14px; outline:none;
-  }
-  input:focus{border-color:var(--acc)}
-  button{
-    appearance:none; border:none; cursor:pointer;
-    background:linear-gradient(90deg, #4a6cff, #6ba4ff);
-    color:white; padding:12px 18px; border-radius:12px;
-    font-weight:700; letter-spacing:.3px;
-    box-shadow:0 8px 18px rgba(80,125,255,.35);
-    transition: transform .05s ease;
-  }
-  button:hover{transform:translateY(-1px)}
-  button.secondary{
-    background:#0c0f15; border:1px solid #2a3143; color:#e5e9f5; box-shadow:none;
-  }
-  .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  .notice{font-size:14px; color:#bcc6de}
-  .tag{display:inline-block; font-size:12px; color:#cbd5f5; background:#0d1220; border:1px solid #22305b; padding:4px 8px; border-radius:999px}
-  .hr{height:1px;background:#222838;margin:14px 0}
-  .hidden{display:none}
-  .center{text-align:center}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Great QueueQuest — Wreckathon Edition</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #161a22;
+        --muted: #8b93a7;
+        --text: #e9ecf1;
+        --acc: #5b8cff;
+        --bad: #ff6b6b;
+        --ok: #19c37d;
+        --warn: #ffb020;
+      }
+      /* Reset-ish */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Calibri, Arial, Helvetica, sans-serif;
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid #222838;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 10px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      h2 {
+        font-size: 22px;
+        color: #dbe3ff;
+      }
+      p.muted,
+      .muted {
+        color: var(--muted);
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+      }
+      input,
+      select {
+        background: #0c0f15;
+        color: var(--text);
+        border: 1px solid #2a3143;
+        border-radius: 10px;
+        padding: 12px 14px;
+        outline: none;
+      }
+      input:focus {
+        border-color: var(--acc);
+      }
+      button {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(90deg, #4a6cff, #6ba4ff);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        box-shadow: 0 8px 18px rgba(80, 125, 255, 0.35);
+        transition: transform 0.05s ease;
+      }
+      button:hover {
+        transform: translateY(-1px);
+      }
+      button.secondary {
+        background: #0c0f15;
+        border: 1px solid #2a3143;
+        color: #e5e9f5;
+        box-shadow: none;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .notice {
+        font-size: 14px;
+        color: #bcc6de;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 12px;
+        color: #cbd5f5;
+        background: #0d1220;
+        border: 1px solid #22305b;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+      .hr {
+        height: 1px;
+        background: #222838;
+        margin: 14px 0;
+      }
+      .hidden {
+        display: none;
+      }
+      .center {
+        text-align: center;
+      }
 
-  /* Stepper dots (top) */
-  .stepper{display:flex; gap:10px; align-items:center; margin-bottom:16px}
-  .dot{
-    width:10px;height:10px;border-radius:50%;
-    background:#25304b;border:1px solid #334166
-  }
-  .dot.active{background:var(--acc)}
-  .dot.done{background:var(--ok)}
+      /* Stepper dots (top) */
+      .stepper {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #25304b;
+        border: 1px solid #334166;
+      }
+      .dot.active {
+        background: var(--acc);
+      }
+      .dot.done {
+        background: var(--ok);
+      }
 
-  /* Survey styles */
-  .q{
-    padding:14px; border:1px dashed #2b3350; border-radius:12px;
-    background:#111522; margin-bottom:12px
-  }
-  .q h3{font-size:16px;margin:0 0 8px}
-  .opt{display:grid; grid-template-columns: 1.2rem auto; align-items:start; gap:10px; padding:8px 6px; border-radius:8px}
-  .opt:hover{background:#0d1120}
-  .opt input{margin-top:2px}
+      /* Survey styles */
+      .q {
+        padding: 14px;
+        border: 1px dashed #2b3350;
+        border-radius: 12px;
+        background: #111522;
+        margin-bottom: 12px;
+      }
+      .q h3 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      .opt {
+        display: grid;
+        grid-template-columns: 1.2rem auto;
+        align-items: start;
+        gap: 10px;
+        padding: 8px 6px;
+        border-radius: 8px;
+      }
+      .opt:hover {
+        background: #0d1120;
+      }
+      .opt input {
+        margin-top: 2px;
+      }
 
-  /* Progress bar (train track gag) */
-  .progress{
-    width:100%; height:12px; border-radius:8px; background:#0c0f15; border:1px solid #2a3143; overflow:hidden
-  }
-  .bar{height:100%; width:0%; background:linear-gradient(90deg,#5b8cff,#80aaff)}
-  .progress-line{position:relative;height:22px;margin-top:10px}
-  .track{position:absolute; inset:0; border-bottom:2px dashed #3a4463}
-  .train{position:absolute; top:-4px; left:0; transition:left .25s ease}
-  .train::before{content:"🚆"; font-size:18px}
+      /* Progress bar (train track gag) */
+      .progress {
+        width: 100%;
+        height: 12px;
+        border-radius: 8px;
+        background: #0c0f15;
+        border: 1px solid #2a3143;
+        overflow: hidden;
+      }
+      .bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #5b8cff, #80aaff);
+      }
+      .progress-line {
+        position: relative;
+        height: 22px;
+        margin-top: 10px;
+      }
+      .track {
+        position: absolute;
+        inset: 0;
+        border-bottom: 2px dashed #3a4463;
+      }
+      .train {
+        position: absolute;
+        top: -4px;
+        left: 0;
+        transition: left 0.25s ease;
+      }
+      .train::before {
+        content: "🚆";
+        font-size: 18px;
+      }
 
-  .toast{
-    background:#10162a; border:1px solid #2a3143; color:#cfe2ff;
-    padding:10px 12px; border-radius:10px; font-size:14px
-  }
-  .warn{color:#ffd29c}
-  .err{color:#ffb0b0}
-  .good{color:#a3f7c2}
+      .toast {
+        background: #10162a;
+        border: 1px solid #2a3143;
+        color: #cfe2ff;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+      .warn {
+        color: #ffd29c;
+      }
+      .err {
+        color: #ffb0b0;
+      }
+      .good {
+        color: #a3f7c2;
+      }
 
-  /* 404 / session card tone */
-  .boom{background: #1a0f12; border-color:#3c1f26}
+      /* 404 / session card tone */
+      .boom {
+        background: #1a0f12;
+        border-color: #3c1f26;
+      }
 
-  a.fake{color:#9cc2ff; text-decoration:none; border-bottom:1px dashed #304b7f; cursor:pointer}
-  a.fake:hover{opacity:.8}
+      a.fake {
+        color: #9cc2ff;
+        text-decoration: none;
+        border-bottom: 1px dashed #304b7f;
+        cursor: pointer;
+      }
+      a.fake:hover {
+        opacity: 0.8;
+      }
 
-  /* Footer hint */
-  .hint{font-size:12px;color:#8b93a7;margin-top:8px}
+      /* Footer hint */
+      .hint {
+        font-size: 12px;
+        color: #8b93a7;
+        margin-top: 8px;
+      }
 
-  /* Seat/grid styles (added) */
-  .seat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
-  .seat{padding:10px;border-radius:8px;font-size:13px;cursor:pointer;text-align:center;border:1px solid rgba(255,255,255,0.04)}
-  .available{background:#144c1c;color:#c8f5d2}
-  .taken{background:#551b1b;color:#fbb}
-  .quota{background:#372056;color:#d5bfff}
-  .vastu{background:#1c3b55;color:#c7e7ff}
-  .cursed{background:#2c2c2c;color:#aaa}
-  .vacay{background:#542c3d;color:#ffcbe3}
-</style>
-</head>
-<body>
-  <div class="wrap">
-    <!-- Stepper -->
-    <div class="stepper" id="stepper">
-      <div class="dot active" data-step="home" title="Home"></div>
-      <div class="dot" data-step="survey" title="Survey"></div>
-      <div class="dot" data-step="search" title="Search"></div>
-      <div class="dot" data-step="seats" title="Seat Selection"></div> <!-- added -->
-      <div class="dot" data-step="confirm" title="Confirmation"></div>
-      <div class="dot" data-step="timeout" title="Session Timeout"></div>
+      /* Seat/grid styles (added) */
+      .seat-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .seat {
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .available {
+        background: #144c1c;
+        color: #c8f5d2;
+      }
+      .taken {
+        background: #551b1b;
+        color: #fbb;
+      }
+      .quota {
+        background: #372056;
+        color: #d5bfff;
+      }
+      .vastu {
+        background: #1c3b55;
+        color: #c7e7ff;
+      }
+      .cursed {
+        background: #2c2c2c;
+        color: #aaa;
+      }
+      .vacay {
+        background: #542c3d;
+        color: #ffcbe3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Stepper -->
+      <div class="stepper" id="stepper">
+        <div class="dot active" data-step="home" title="Home"></div>
+        <div class="dot" data-step="survey" title="Survey"></div>
+        <div class="dot" data-step="search" title="Search"></div>
+        <div class="dot" data-step="seats" title="Seat Selection"></div>
+        <!-- added -->
+        <div class="dot" data-step="confirm" title="Confirmation"></div>
+        <div class="dot" data-step="timeout" title="Session Timeout"></div>
+      </div>
+
+      <!-- ========== HOME ========== -->
+      <section id="home" class="card">
+        <h1>Queue-Kyun.com</h1>
+        <p class="muted">“Book your tickets… <em>agar himmat hai toh</em>.”</p>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="field">
+            <label for="name">Apna shubh naam bataiye</label>
+            <input id="name" placeholder="e.g., Sameer" />
+            <span class="hint"
+              >Note: sirf pehchaan ke liye (aur thoda data bechne ke liye
+              😬)</span
+            >
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="actions">
+          <button id="bookBtn">Book Now</button>
+          <span class="notice"
+            >Warning: Ye journey <strong>kamzor dil walon</strong> ke liye nahi
+            hai.</span
+          >
+        </div>
+      </section>
+
+      <!-- ========== SURVEY (MCQ) ========== -->
+      <section id="survey" class="card hidden">
+        <h2>Fast Survey (phir hi aage jaa paoge)</h2>
+        <p class="muted">
+          Niche wale sab sawaalon ka ek-ek jawab do. Phir “Proceed”.
+        </p>
+        <div class="hr"></div>
+
+        <div class="q" data-q="q1">
+          <h3>1) Ticket booking server kab kaam karta hai?</h3>
+          <label class="opt"
+            ><input type="radio" name="q1" value="a" />
+            <span>Jab server ka mood ho 😌</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q1" value="b" />
+            <span>Jab chai break khatam ho ☕</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q1" value="c" />
+            <span>Jab Pindrop Baba aashirwad de 🙏</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q1" value="d" />
+            <span>Kabhi nahi 🚫</span></label
+          >
+        </div>
+
+        <div class="q" data-q="q2">
+          <h3>2) Life ka asli matlab kya hai?</h3>
+          <label class="opt"
+            ><input type="radio" name="q2" value="a" />
+            <span>Ek aur Queue</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q2" value="b" />
+            <span>OTP ka wait karna</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q2" value="c" />
+            <span>Loading screen dekhna</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q2" value="d" />
+            <span>Sabka time barbaad karna</span></label
+          >
+        </div>
+
+        <div class="q" data-q="q3">
+          <h3>3) Train late kyu hoti hai?</h3>
+          <label class="opt"
+            ><input type="radio" name="q3" value="a" />
+            <span>Driver ne snooze maar diya ⏰</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q3" value="b" />
+            <span>Railway server PUBG khel raha hai 🎮</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q3" value="c" />
+            <span>Chalti hai bhai… India hai 😎</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q3" value="d" />
+            <span>Kya aapko lagta hai hum reason denge?</span></label
+          >
+        </div>
+
+        <div class="q" data-q="q4">
+          <h3>4) OTP kahan milega?</h3>
+          <label class="opt"
+            ><input type="radio" name="q4" value="a" />
+            <span>SMS – 2–3 business hours mein 📱</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q4" value="b" />
+            <span>Kabootar se – jab uska mann kare 🕊️</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q4" value="c" />
+            <span>Aapke padosi ke sapne mein 🌙</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q4" value="d" />
+            <span>Bunty ke rona-dhona GIFs ke beech 😭</span></label
+          >
+        </div>
+
+        <div class="q" data-q="q5">
+          <h3>5) Ticket price ₹10200 hai. Final payment kitna hoga?</h3>
+          <label class="opt"
+            ><input type="radio" name="q5" value="a" />
+            <span>₹10200 + chai-paani charges</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q5" value="b" />
+            <span>₹10200 + Emotional Damage surcharge</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q5" value="c" />
+            <span>₹10200 + server ke birthday gift 🎁</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q5" value="d" />
+            <span>₹10200 + sab kuch mila ke ₹9999</span></label
+          >
+        </div>
+
+        <div class="q" data-q="q6">
+          <h3>6) Ticket milega kab?</h3>
+          <label class="opt"
+            ><input type="radio" name="q6" value="a" />
+            <span>Agle janam mein</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q6" value="b" />
+            <span>Jab full moon ho 🌕</span></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q6" value="c" />
+            <span
+              >Jab aap refresh karoge aur sab reset ho jayega 🔄</span
+            ></label
+          >
+          <label class="opt"
+            ><input type="radio" name="q6" value="d" />
+            <span>Mil hi nahi raha bhai</span></label
+          >
+        </div>
+
+        <div class="actions">
+          <button id="surveyNext">Proceed</button>
+          <span id="surveyMsg" class="notice"></span>
+        </div>
+      </section>
+
+      <!-- ========== SEARCH PAGE (LABYRINTH) ========== -->
+      <section id="search" class="card hidden">
+        <h2>Search Tickets</h2>
+  <p class="muted">Form bhar do. System khush hoga (shayad).</p>
+  <div class="row">
+    <div class="field">
+      <label for="from">From</label>
+      <input id="from" placeholder="e.g., Delhi" />
     </div>
-
-    <!-- ========== HOME ========== -->
-    <section id="home" class="card">
-      <h1>Queue-Kyun.com</h1>
-      <p class="muted">“Book your tickets… <em>agar himmat hai toh</em>.”</p>
-      <div class="hr"></div>
-      <div class="row">
-        <div class="field">
-          <label for="name">Apna shubh naam bataiye</label>
-          <input id="name" placeholder="e.g., Sameer" />
-          <span class="hint">Note: sirf pehchaan ke liye (aur thoda data bechne ke liye 😬)</span>
-        </div>
-      </div>
-      <div class="hr"></div>
-      <div class="actions">
-        <button id="bookBtn">Book Now</button>
-        <span class="notice">Warning: Ye journey <strong>kamzor dil walon</strong> ke liye nahi hai.</span>
-      </div>
-    </section>
-
-    <!-- ========== SURVEY (MCQ) ========== -->
-    <section id="survey" class="card hidden">
-      <h2>Fast Survey (phir hi aage jaa paoge)</h2>
-      <p class="muted">Niche wale sab sawaalon ka ek-ek jawab do. Phir “Proceed”.</p>
-      <div class="hr"></div>
-
-      <div class="q" data-q="q1">
-        <h3>1) Ticket booking server kab kaam karta hai?</h3>
-        <label class="opt"><input type="radio" name="q1" value="a"> <span>Jab server ka mood ho 😌</span></label>
-        <label class="opt"><input type="radio" name="q1" value="b"> <span>Jab chai break khatam ho ☕</span></label>
-        <label class="opt"><input type="radio" name="q1" value="c"> <span>Jab Pindrop Baba aashirwad de 🙏</span></label>
-        <label class="opt"><input type="radio" name="q1" value="d"> <span>Kabhi nahi 🚫</span></label>
-      </div>
-
-      <div class="q" data-q="q2">
-        <h3>2) Life ka asli matlab kya hai?</h3>
-        <label class="opt"><input type="radio" name="q2" value="a"> <span>Ek aur Queue</span></label>
-        <label class="opt"><input type="radio" name="q2" value="b"> <span>OTP ka wait karna</span></label>
-        <label class="opt"><input type="radio" name="q2" value="c"> <span>Loading screen dekhna</span></label>
-        <label class="opt"><input type="radio" name="q2" value="d"> <span>Sabka time barbaad karna</span></label>
-      </div>
-
-      <div class="q" data-q="q3">
-        <h3>3) Train late kyu hoti hai?</h3>
-        <label class="opt"><input type="radio" name="q3" value="a"> <span>Driver ne snooze maar diya ⏰</span></label>
-        <label class="opt"><input type="radio" name="q3" value="b"> <span>Railway server PUBG khel raha hai 🎮</span></label>
-        <label class="opt"><input type="radio" name="q3" value="c"> <span>Chalti hai bhai… India hai 😎</span></label>
-        <label class="opt"><input type="radio" name="q3" value="d"> <span>Kya aapko lagta hai hum reason denge?</span></label>
-      </div>
-
-      <div class="q" data-q="q4">
-        <h3>4) OTP kahan milega?</h3>
-        <label class="opt"><input type="radio" name="q4" value="a"> <span>SMS – 2–3 business hours mein 📱</span></label>
-        <label class="opt"><input type="radio" name="q4" value="b"> <span>Kabootar se – jab uska mann kare 🕊️</span></label>
-        <label class="opt"><input type="radio" name="q4" value="c"> <span>Aapke padosi ke sapne mein 🌙</span></label>
-        <label class="opt"><input type="radio" name="q4" value="d"> <span>Bunty ke rona-dhona GIFs ke beech 😭</span></label>
-      </div>
-
-      <div class="q" data-q="q5">
-        <h3>5) Ticket price ₹1200 hai. Final payment kitna hoga?</h3>
-        <label class="opt"><input type="radio" name="q5" value="a"> <span>₹1200 + chai-paani charges</span></label>
-        <label class="opt"><input type="radio" name="q5" value="b"> <span>₹1200 + Emotional Damage surcharge</span></label>
-        <label class="opt"><input type="radio" name="q5" value="c"> <span>₹1200 + server ke birthday gift 🎁</span></label>
-        <label class="opt"><input type="radio" name="q5" value="d"> <span>₹1200 + sab kuch mila ke ₹9999</span></label>
-      </div>
-
-      <div class="q" data-q="q6">
-        <h3>6) Ticket milega kab?</h3>
-        <label class="opt"><input type="radio" name="q6" value="a"> <span>Agle janam mein</span></label>
-        <label class="opt"><input type="radio" name="q6" value="b"> <span>Jab full moon ho 🌕</span></label>
-        <label class="opt"><input type="radio" name="q6" value="c"> <span>Jab aap refresh karoge aur sab reset ho jayega 🔄</span></label>
-        <label class="opt"><input type="radio" name="q6" value="d"> <span>Mil hi nahi raha bhai</span></label>
-      </div>
-
-      <div class="actions">
-        <button id="surveyNext">Proceed</button>
-        <span id="surveyMsg" class="notice"></span>
-      </div>
-    </section>
-
-    <!-- ========== SEARCH PAGE (LABYRINTH) ========== -->
-    <section id="search" class="card hidden">
-      <h2>Search Tickets</h2>
-      <p class="muted">Form bhar do. System khush hoga (shayad).</p>
-      <div class="row">
-        <div class="field">
-        </div>
-        <div class="field">
-        </div>
-      </div>
-      <div class="hr"></div>
-      <div class="actions">
-        <button id="searchBtn">Search</button>
-        <span class="tag">Slow mode ON — taaki jokes padh sako</span>
-      </div>
-
-      <div id="progressArea" class="hidden" style="margin-top:16px">
-        <div class="progress"><div class="bar" id="bar"></div></div>
-        <div class="progress-line">
-          <div class="track"></div>
-          <div class="train" id="train"></div> <!-- train element required by JS -->
-        </div>
-        <div id="pmsg" class="toast" style="margin-top:10px">Starting…</div>
-      </div>
-    </section>
-
-    <!-- ========== SEAT SELECTION (ADDED) ========== -->
-    <section id="seats" class="card hidden">
-      <h2>Select Your Seat</h2>
-      <p class="muted">Warning: seats apne aap bhaag sakti hain 😏</p>
-      <div class="seat-grid" id="seatGrid"></div>
-      <div class="hr"></div>
-      <div class="actions">
-        <button id="confirmSeat" class="secondary">Lock Seat</button>
-        <span id="seatMsg" class="toast hidden" style="margin-left:8px"></span>
-      </div>
-    </section>
-
-    <!-- ========== CONFIRMATION (MIRAGE) ========== -->
-    <section id="confirm" class="card hidden">
-      <h2>CONGRATULATIONS, <span id="who">User</span>!</h2>
-      <p class="muted">You have successfully submitted your booking request for review.</p>
-      <div class="hr"></div>
-      <div class="toast">
-        Token No.: <strong>#8475B</strong><br/>
-        A committee will be formed within <strong>3–5 business days</strong> to assess your claim.<br/>
-        Please check the status after the next <strong>full moon</strong> by sending a <strong>fax</strong> to the regional office.
-      </div>
-      <div class="hr"></div>
-      <div class="actions">
-        <a class="fake" id="printBtn">Print Application Form</a>
-        <button class="secondary" id="finishBtn">I’m Done</button>
-        <span class="notice">Note: Real ticket? Nahi. Hope? Bhi nahi.</span>
-      </div>
-    </section>
-
-    <!-- ========== FAKE 404 (inline) ========== -->
-    <section id="fake404" class="card boom hidden">
-      <h2>404 — Acche Din Loading…</h2>
-      <p>“Print Application Form” currently unavailable. Kindly try after <em>andher nagri</em> ka aadesh.</p>
-      <p class="muted">Redirecting to Session Timeout in <span id="redir">10</span>s…</p>
-    </section>
-
-    <!-- ========== SESSION TIMEOUT ========== -->
-    <section id="timeout" class="card hidden">
-      <h2>Session Timed Out</h2>
-      <p class="muted">Lagta hai aap thoda der laga diye. But don’t worry, hum second chances pe vishwas rakhte hain.</p>
-      <div class="actions">
-        <button id="restart">Start Again</button>
-      </div>
-    </section>
-
-    <div class="hint center" style="margin-top:14px">
-      Built for laughs at Wreckathon • Keep it simple, keep it silly.
+    <div class="field">
+      <label for="to">To</label>
+      <input id="to" placeholder="e.g., Mumbai" />
     </div>
   </div>
+  <div class="hr"></div>
+  <div class="actions">
+    <button id="searchBtn">Search</button>
+    <span class="tag">Slow mode ON — taaki jokes padh sako</span>
+  </div>
 
-<script>
-  // ——— helpers
-  const byId = (id)=>document.getElementById(id);
-  const show = (id)=>byId(id).classList.remove('hidden');
-  const hide = (id)=>byId(id).classList.add('hidden');
-  const setStep = (name)=>{
-    const order = ['home','survey','search','seats','confirm','timeout']; // updated to include seats
-    order.forEach((s,i)=>{
-      const sec = byId(s);
-      if(!sec) return;
-      if(s===name) sec.classList.remove('hidden'); else sec.classList.add('hidden');
-    });
-    // stepper dots
-    document.querySelectorAll('.dot').forEach(d=>{
-      d.classList.remove('active','done');
-    });
-    let activeHit=false;
-    document.querySelectorAll('.dot').forEach((d,i)=>{
-      if(d.getAttribute('data-step')===name){ d.classList.add('active'); activeHit=true; }
-      else if(!activeHit) d.classList.add('done');
-    });
-  };
+  <div id="progressArea" class="hidden" style="margin-top:16px">
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="progress-line">
+      <div class="track"></div>
+      <div class="train" id="train"></div>
+    </div>
+    <div id="pmsg" class="toast" style="margin-top:10px">Starting…</div>
+  </div>
+    <div class="video-player" style="display:flex; justify-content:center; margin-top:40px;">
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/dgAUqLr4D7A?autoplay=1&mute=0&controls=0&showinfo=0&rel=0&modestbranding=1" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+    </div>
+        <div id="progressArea" class="hidden" style="margin-top: 16px">
+          <div class="progress"><div class="bar" id="bar"></div></div>
+          <div class="progress-line">
+            <div class="track"></div>
+            <div class="train" id="train"></div>
+            <!-- train element required by JS -->
+          </div>
+          <div id="pmsg" class="toast" style="margin-top: 10px; font-size:20px">Starting…</div>
+        </div>
+      </section>
 
-  // ——— state
-  let userName = '';
+      <!-- ========== SEAT SELECTION (ADDED) ========== -->
+      <section id="seats" class="card hidden">
+        <h2>Select Your Seat</h2>
+        <p class="muted">Warning: seats apne aap bhaag sakti hain 😏</p>
+        <div class="seat-grid" id="seatGrid"></div>
+        <div class="hr"></div>
+        <div class="actions">
+          <button id="confirmSeat" class="secondary">Lock Seat</button>
+          <span
+            id="seatMsg"
+            class="toast hidden"
+            style="margin-left: 8px"
+          ></span>
+        </div>
+      </section>
+
+      <!-- ========== CONFIRMATION (MIRAGE) ========== -->
+      <section id="confirm" class="card hidden">
+        <h2>CONGRATULATIONS, <span id="who">User</span>!</h2>
+        <p class="muted">
+          You have successfully submitted your booking request for review.
+        </p>
+        <div class="hr"></div>
+        <div class="toast">
+          Token No.: <strong>#8475B</strong><br />
+          A committee will be formed within
+          <strong>3–5 business days</strong> to assess your claim.<br />
+          Please check the status after the next <strong>full moon</strong> by
+          sending a <strong>fax</strong> to the regional office.
+        </div>
+        <div class="hr"></div>
+        <div class="actions">
+          <a class="fake" id="printBtn">Print Application Form</a>
+          <button class="secondary" id="finishBtn">I’m Done</button>
+          <span class="notice">Note: Real ticket? Nahi. Hope? Bhi nahi.</span>
+        </div>
+      </section>
+
+      <!-- ========== FAKE 404 (inline) ========== -->
+      <section id="fake404" class="card boom hidden">
+        <h2>404 — Acche Din Loading…</h2>
+        <p>
+          “Print Application Form” currently unavailable. Kindly try after
+          <em>andher nagri</em> ka aadesh.
+        </p>
+        <p class="muted">
+          Redirecting to Session Timeout in <span id="redir">10</span>s…
+          <div>
+          <iframe width="640" height="360" src="ache din.mp4" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+        </div>
+        </p>
+      </section>
+
+      <!-- ========== SESSION TIMEOUT ========== -->
+      <section id="timeout" class="card hidden">
+        <h2>Session Timed Out</h2>
+        <p class="muted">
+          Lagta hai aap thoda der laga diye. But don’t worry, hum second chances
+          pe vishwas rakhte hain.
+        </p>
+        <div class="actions">
+          <button id="restart">Start Again</button>
+        </div>
+      </section>
+
+      <div class="hint center" style="margin-top: 14px">
+        Built for laughs at Wreckathon • Keep it simple, keep it silly.
+      </div>
+    </div>
+
+    <script>
+      // ——— helpers
+      const byId = (id) => document.getElementById(id);
+      const show = (id) => byId(id).classList.remove("hidden");
+      const hide = (id) => byId(id).classList.add("hidden");
+      const setStep = (name) => {
+        const order = [
+          "home",
+          "survey",
+          "search",
+          "seats",
+          "confirm",
+          "timeout",
+        ]; // updated to include seats
+        order.forEach((s, i) => {
+          const sec = byId(s);
+          if (!sec) return;
+          if (s === name) sec.classList.remove("hidden");
+          else sec.classList.add("hidden");
+        });
+        // stepper dots
+        document.querySelectorAll(".dot").forEach((d) => {
+          d.classList.remove("active", "done");
+        });
+        let activeHit = false;
+        document.querySelectorAll(".dot").forEach((d, i) => {
+          if (d.getAttribute("data-step") === name) {
+            d.classList.add("active");
+            activeHit = true;
+          } else if (!activeHit) d.classList.add("done");
+        });
+      };
+
+      // ——— state
+      let userName = "";
   let toTries = 0;
-  const toTrolls = ["Lulla Nagar, Maharashtra","Bhosari, Pune"];
-  const pMsgs = [
-    "5% → Conductor Saab ka mood check ho raha hai.",
-    "27% → Form 'agley table' pe gaya hai.",
-    "47% → File 'under consideration' hai, agle 'janam' tak mil jayega.",
-    "78% → Server ko 'Jhatka' diya ja raha hai (paani se).",
-    "99% → Ticket bhejne ka 'shubh muhurat' nikal raha hai.",
-    "…back to 45% → Error: Chai-sutta break chal raha hai."
-  ];
+  const toTrolls = ["Lulla Nagar, Maharashtra", "Bhosari, Pune"];
+      const pMsgs = [
+        "5% → Conductor Saab ka mood check ho raha hai.",
+        "27% → Form 'agley table' pe gaya hai.",
+        "47% → File 'under consideration' hai, agle 'janam' tak mil jayega.",
+        "78% → Server ko 'Jhatka' diya ja raha hai (paani se).",
+        "99% → Ticket bhejne ka 'shubh muhurat' nikal raha hai.",
+        "…back to 45% → Error: Chai-sutta break chal raha hai.",
+      ];
 
-  // ——— Home
-  byId('bookBtn').addEventListener('click', ()=>{
-    userName = (byId('name').value || 'Maha-Yatri').trim();
-    setStep('survey');
-  });
-
-  /* --- Button dodge behaviour (added) --- */
-  (function(){
-    const dodgeBtn = byId('bookBtn');
-    const homeActions = document.querySelector('#home .actions');
-    if(!dodgeBtn || !homeActions) return;
-
-    // make container relative so button can be positioned inside it
-    homeActions.style.position = 'relative';
-    homeActions.style.minHeight = '56px';
-
-    // initial button positioning + smooth movement
-    dodgeBtn.style.position = 'absolute';
-    dodgeBtn.style.left = '12px';
-    dodgeBtn.style.top = '8px';
-    dodgeBtn.style.transition = 'left .14s ease, top .14s ease, transform .12s ease';
-    dodgeBtn.style.zIndex = 20;
-
-    let dodgeEnabled = true;
-    const THRESH = 100; // px - how close the cursor must be to trigger dodge
-
-    // reset position when stepping into home
-    const origPos = {left:12, top:8};
-    const resetIfHome = (name)=>{
-      if(name === 'home'){
-        dodgeBtn.style.left = origPos.left + 'px';
-        dodgeBtn.style.top = origPos.top + 'px';
-        dodgeEnabled = true;
-      }
-    };
-
-    // hook into setStep by wrapping original (safe: setStep already exists)
-    // If setStep is not a function yet, skip wrapping.
-    if(typeof setStep === 'function'){
-      const _setStep = setStep;
-      window.setStep = function(name){
-        _setStep(name);
-        resetIfHome(name);
-      };
-    }
-
-    homeActions.addEventListener('mousemove', (ev)=>{
-      if(!dodgeEnabled) return;
-      const bRect = dodgeBtn.getBoundingClientRect();
-      const bcx = bRect.left + bRect.width/2;
-      const bcy = bRect.top + bRect.height/2;
-      const dx = ev.clientX - bcx;
-      const dy = ev.clientY - bcy;
-      const dist = Math.hypot(dx, dy);
-      if(dist > THRESH) return;
-
-      const cont = homeActions.getBoundingClientRect();
-      // compute bounds for top/left inside container (keep some padding)
-      const pad = 8;
-      const maxX = Math.max(0, cont.width - bRect.width - pad);
-      const maxY = Math.max(0, cont.height - bRect.height - pad);
-
-      // choose a new position biased away from the cursor:
-      // attempt to push to the opposite quadrant
-      let nx = (dx > 0) ? pad : maxX;
-      let ny = (dy > 0) ? pad : maxY;
-
-      // add a small random offset so it doesn't always jump to corners
-      nx = Math.min(maxX, Math.max(pad, nx + (Math.random()*80 - 40)));
-      ny = Math.min(maxY, Math.max(pad, ny + (Math.random()*40 - 20)));
-
-      dodgeBtn.style.left = nx + 'px';
-      dodgeBtn.style.top = ny + 'px';
-    });
-
-    // once user successfully clicks the button, stop dodging
-    dodgeBtn.addEventListener('click', ()=>{
-      dodgeEnabled = false;
-      dodgeBtn.style.transform = 'scale(1.03)';
-      setTimeout(()=>{
-        dodgeBtn.style.transform = '';
-      }, 120);
-    });
-  })();
-
-  // ——— Survey validation
-  byId('surveyNext').addEventListener('click', ()=>{
-    const groups = ['q1','q2','q3','q4','q5','q6'];
-    let ok=true, firstMissing=null;
-    groups.forEach(g=>{
-      const chosen = document.querySelector(`input[name="${g}"]:checked`);
-      if(!chosen){ ok=false; if(!firstMissing) firstMissing=g; }
-    });
-    const msg = byId('surveyMsg');
-    if(!ok){
-      msg.textContent = "Sabke answers do pehle. System ko sab pata chal jaata hai 😎";
-      return;
-    }
-    msg.textContent = "Shabash. Ab asli dard shuru hota hai → Search.";
-    setTimeout(()=>setStep('search'), 650);
-  });
-
-  // ——— Search page logic
-  const toInput = byId('to');
-  if(toInput){
-    toInput.addEventListener('input', ()=>{
-      const val = toInput.value.toLowerCase();
-      if(val.includes('mumbai') || val.includes('bom')){
-        if(toTries < toTrolls.length){
-          toInput.value = toTrolls[toTries++];
-        }
-      }
-    });
-  }
-
-  byId('searchBtn').addEventListener('click', ()=>{
-    show('progressArea');
-    runProgress();
-  });
-
-  function runProgress(){
-    const bar = byId('bar');
-    const train = byId('train');
-    const msg = byId('pmsg');
-    let pct = 0;
-    let phase = 0; // 0→up, 1→down, 2→finish
-
-    const timer = setInterval(()=>{
-      if(phase===0){ pct += 3; }
-      else if(phase===1){ pct -= 7; }
-      if(pct<0)pct=0;
-      if(pct>100)pct=100;
-
-      if(bar) bar.style.width = pct + '%';
-      if(train) train.style.left = `calc(${pct}% - 10px)`;
-
-      if(pct<=7) msg.textContent = pMsgs[0];
-      else if(pct<=33) msg.textContent = pMsgs[1];
-      else if(pct<=60) msg.textContent = pMsgs[2];
-      else if(pct<=80) msg.textContent = pMsgs[3];
-      else if(pct<=98) msg.textContent = pMsgs[4];
-
-      if(pct>=99 && phase===0){
-        msg.textContent = pMsgs[5];
-        phase=1;
-      }
-
-      if(phase===1 && pct<=45){
-        phase=2;
-      }
-      if(phase===2){
-        pct += 2;
-        if(bar) bar.style.width = pct + '%';
-        if(train) train.style.left = `calc(${pct}% - 10px)`;
-        if(pct>=100){
-          clearInterval(timer);
-          // finished search → go to seat selection
-          setTimeout(()=>setStep('seats'), 600);
-        }
-      }
-    }, 220); // slow-ish so jokes are readable
-  }
-
-  // ——— Seat selection logic (added)
-  const seats = [
-    {label:"A1 Window",cls:"available"},
-    {label:"A2",cls:"taken"},
-    {label:"B1",cls:"quota"},
-    {label:"B2",cls:"vastu"},
-    {label:"C1",cls:"cursed"},
-    {label:"C2 Goa Vacay",cls:"vacay"},
-    {label:"D1 Window",cls:"available"},
-    {label:"D2",cls:"taken"},
-    {label:"E1",cls:"quota"},
-    {label:"E2",cls:"available"},
-    {label:"F13 Haunted",cls:"cursed"},
-    {label:"G1",cls:"available"}
-  ];
-  let chosenSeat = null;
-  const grid = byId("seatGrid");
-  const seatMsg = byId("seatMsg");
-  if(grid){
-    seats.forEach((s,i)=>{
-      const d = document.createElement("div");
-      d.textContent = s.label;
-      d.className = "seat " + s.cls;
-      d.onclick = ()=>{
-        if(s.cls !== "available"){
-          if(seatMsg){ seatMsg.classList.remove("hidden"); seatMsg.textContent = `Seat ${s.label} unavailable 😂`; }
-          return;
-        }
-        // 50% chance seat runs away
-        if(Math.random() < 0.5){
-          d.className = "seat taken";
-          if(seatMsg){ seatMsg.classList.remove("hidden"); seatMsg.textContent = `Seat ${s.label} bhaag gayi 😭`; }
-          return;
-        }
-        chosenSeat = s.label;
-        if(seatMsg){ seatMsg.classList.remove("hidden"); seatMsg.textContent = `Congrats! Tumhe seat ${s.label} mil gayi (toilet ke paas 🚽)`; }
-      };
-      grid.appendChild(d);
-    });
-  }
-
-  byId("confirmSeat").addEventListener('click', ()=>{
-    if(!chosenSeat){
-      if(seatMsg){ seatMsg.classList.remove("hidden"); seatMsg.textContent = "Pehle ek seat pakdo 😡"; }
-      return;
-    }
-    // show confirmation page and display who
-    const who = byId('who');
-    if(who) who.textContent = (userName || 'Maha-Yatri');
-    setStep('confirm');
-  });
-
-  // ——— Confirmation & fake 404 + timeout
-  byId('printBtn').addEventListener('click', (e)=>{
-    e.preventDefault();
-    hide('confirm');
-    show('fake404');
-    // countdown then timeout
-    let n=10;
-    const out = byId('redir');
-    const t = setInterval(()=>{
-      out.textContent = String(n);
-      n--;
-      if(n<0){
-        clearInterval(t);
-        hide('fake404');
-        setStep('timeout');
-      }
-    }, 1000);
-  });
-
-  byId('finishBtn').addEventListener('click', ()=>{
-    // same flow as print: it never gives real ticket
-    hide('confirm');
-    show('fake404');
-    let n=10;
-    const out = byId('redir');
-    const t = setInterval(()=>{
-      out.textContent = String(n);
-      n--;
-      if(n<0){
-        clearInterval(t);
-        hide('fake404');
-        setStep('timeout');
-      }
-    }, 1000);
-  });
-
-  byId('restart').addEventListener('click', ()=>{
-    // reset minimal state
-    toTries = 0;
-    const toEl = byId('to'); if(toEl) toEl.value = '';
-    const nameEl = byId('name'); if(nameEl) nameEl.value = '';
-    document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
-    hide('progressArea'); const b = byId('bar'); if(b) b.style.width='0%';
-    const tr = byId('train'); if(tr) tr.style.left='0';
-    // reset seats grid
-    chosenSeat = null;
-    if(seatMsg){ seatMsg.classList.add('hidden'); seatMsg.textContent=''; }
-    // rebuild seat grid (quick reset)
-    if(grid){
-      grid.innerHTML = '';
-      seats.forEach((s)=>{
-        const d = document.createElement("div");
-        d.textContent = s.label;
-        d.className = "seat " + s.cls;
-        d.onclick = ()=>{ /* same handler won't be reattached here for brevity; reload resets fully */ };
-        grid.appendChild(d);
+      // ——— Home
+      byId("bookBtn").addEventListener("click", () => {
+        userName = (byId("name").value || "Maha-Yatri").trim();
+        setStep("survey");
       });
-    }
-    setStep('home');
-  });
 
-  // start at home
-  setStep('home');
-</script>
-</body>
+      /* --- Button dodge behaviour (added) --- */
+      (function () {
+        const dodgeBtn = byId("bookBtn");
+        const homeActions = document.querySelector("#home .actions");
+        if (!dodgeBtn || !homeActions) return;
+
+        // make container relative so button can be positioned inside it
+        homeActions.style.position = "relative";
+        homeActions.style.minHeight = "56px";
+
+        // initial button positioning + smooth movement
+        dodgeBtn.style.position = "absolute";
+        dodgeBtn.style.left = "12px";
+        dodgeBtn.style.top = "8px";
+        dodgeBtn.style.transition =
+          "left .14s ease, top .14s ease, transform .12s ease";
+        dodgeBtn.style.zIndex = 20;
+
+        let dodgeEnabled = true;
+        const THRESH = 100; // px - how close the cursor must be to trigger dodge
+
+        // reset position when stepping into home
+        const origPos = { left: 12, top: 8 };
+        const resetIfHome = (name) => {
+          if (name === "home") {
+            dodgeBtn.style.left = origPos.left + "px";
+            dodgeBtn.style.top = origPos.top + "px";
+            dodgeEnabled = true;
+          }
+        };
+
+        // hook into setStep by wrapping original (safe: setStep already exists)
+        // If setStep is not a function yet, skip wrapping.
+        if (typeof setStep === "function") {
+          const _setStep = setStep;
+          window.setStep = function (name) {
+            _setStep(name);
+            resetIfHome(name);
+          };
+        }
+
+        homeActions.addEventListener("mousemove", (ev) => {
+          if (!dodgeEnabled) return;
+          const bRect = dodgeBtn.getBoundingClientRect();
+          const bcx = bRect.left + bRect.width / 2;
+          const bcy = bRect.top + bRect.height / 2;
+          const dx = ev.clientX - bcx;
+          const dy = ev.clientY - bcy;
+          const dist = Math.hypot(dx, dy);
+          if (dist > THRESH) return;
+
+          const cont = homeActions.getBoundingClientRect();
+          // compute bounds for top/left inside container (keep some padding)
+          const pad = 8;
+          const maxX = Math.max(0, cont.width - bRect.width - pad);
+          const maxY = Math.max(0, cont.height - bRect.height - pad);
+
+          // choose a new position biased away from the cursor:
+          // attempt to push to the opposite quadrant
+          let nx = dx > 0 ? pad : maxX;
+          let ny = dy > 0 ? pad : maxY;
+
+          // add a small random offset so it doesn't always jump to corners
+          nx = Math.min(maxX, Math.max(pad, nx + (Math.random() * 80 - 40)));
+          ny = Math.min(maxY, Math.max(pad, ny + (Math.random() * 40 - 20)));
+
+          dodgeBtn.style.left = nx + "px";
+          dodgeBtn.style.top = ny + "px";
+        });
+
+        // once user successfully clicks the button, stop dodging
+        dodgeBtn.addEventListener("click", () => {
+          dodgeEnabled = false;
+          dodgeBtn.style.transform = "scale(1.03)";
+          setTimeout(() => {
+            dodgeBtn.style.transform = "";
+          }, 120);
+        });
+      })();
+
+      // ——— Survey validation
+      byId("surveyNext").addEventListener("click", () => {
+        const groups = ["q1", "q2", "q3", "q4", "q5", "q6"];
+        let ok = true,
+          firstMissing = null;
+        groups.forEach((g) => {
+          const chosen = document.querySelector(`input[name="${g}"]:checked`);
+          if (!chosen) {
+            ok = false;
+            if (!firstMissing) firstMissing = g;
+          }
+        });
+        const msg = byId("surveyMsg");
+        if (!ok) {
+          msg.textContent =
+            "Sabke answers do pehle. System ko sab pata chal jaata hai 😎";
+          return;
+        }
+        msg.textContent = "Shabash. Ab asli dard shuru hota hai → Search.";
+        setTimeout(() => setStep("search"), 650);
+      });
+
+      // ——— Search page logic
+      const toInput = byId("to");
+      if (toInput) {
+        toInput.addEventListener("input", () => {
+          const val = toInput.value.toLowerCase();
+          if (val.includes("mumbai") || val.includes("bom")) {
+            toInput.value = toTrolls[toTries % toTrolls.length];
+            toTries++;
+          }
+        });
+      }
+
+      byId("searchBtn").addEventListener("click", () => {
+        show("progressArea");
+        runProgress();
+      });
+
+      function runProgress() {
+        const bar = byId("bar");
+        const train = byId("train");
+        const msg = byId("pmsg");
+        let pct = 0;
+        let phase = 0; // 0→up, 1→down, 2→finish
+
+        const timer = setInterval(() => {
+          if (phase === 0) {
+            pct += 3;
+          } else if (phase === 1) {
+            pct -= 7;
+          }
+          if (pct < 0) pct = 0;
+          if (pct > 100) pct = 100;
+
+          if (bar) bar.style.width = pct + "%";
+          if (train) train.style.left = `calc(${pct}% - 10px)`;
+
+          if (pct <= 7) msg.textContent = pMsgs[0];
+          else if (pct <= 33) msg.textContent = pMsgs[1];
+          else if (pct <= 60) msg.textContent = pMsgs[2];
+          else if (pct <= 80) msg.textContent = pMsgs[3];
+          else if (pct <= 98) msg.textContent = pMsgs[4];
+
+          if (pct >= 99 && phase === 0) {
+            msg.textContent = pMsgs[5];
+            phase = 1;
+          }
+
+          if (phase === 1 && pct <= 45) {
+            phase = 2;
+          }
+          if (phase === 2) {
+            pct += 2;
+            if (bar) bar.style.width = pct + "%";
+            if (train) train.style.left = `calc(${pct}% - 10px)`;
+            if (pct >= 100) {
+              clearInterval(timer);
+              // finished search → go to seat selection
+              setTimeout(() => setStep("seats"), 600);
+            }
+          }
+        }, 220); // slow-ish so jokes are readable
+      }
+
+      // ——— Seat selection logic (added)
+      const seats = [
+        { label: "A1 Window", cls: "available" },
+        { label: "A2", cls: "taken" },
+        { label: "B1", cls: "quota" },
+        { label: "B2", cls: "vastu" },
+        { label: "C1", cls: "cursed" },
+        { label: "C2 Goa Vacay", cls: "vacay" },
+        { label: "D1 Window", cls: "available" },
+        { label: "D2", cls: "taken" },
+        { label: "E1", cls: "quota" },
+        { label: "E2", cls: "available" },
+        { label: "F13 Haunted", cls: "cursed" },
+        { label: "G1", cls: "available" },
+      ];
+      let chosenSeat = null;
+      const grid = byId("seatGrid");
+      const seatMsg = byId("seatMsg");
+      if (grid) {
+        seats.forEach((s, i) => {
+          const d = document.createElement("div");
+          d.textContent = s.label;
+          d.className = "seat " + s.cls;
+          d.onclick = () => {
+            if (s.cls !== "available") {
+              if (seatMsg) {
+                seatMsg.classList.remove("hidden");
+                seatMsg.textContent = `Seat ${s.label} unavailable 😂`;
+              }
+              return;
+            }
+            // 50% chance seat runs away
+            if (Math.random() < 0.5) {
+              d.className = "seat taken";
+              if (seatMsg) {
+                seatMsg.classList.remove("hidden");
+                seatMsg.textContent = `Seat ${s.label} bhaag gayi 😭`;
+              }
+              return;
+            }
+            chosenSeat = s.label;
+            if (seatMsg) {
+              seatMsg.classList.remove("hidden");
+              seatMsg.textContent = `Congrats! Tumhe seat ${s.label} mil gayi (toilet ke paas 🚽)`;
+            }
+          };
+          grid.appendChild(d);
+        });
+      }
+
+      byId("confirmSeat").addEventListener("click", () => {
+        if (!chosenSeat) {
+          if (seatMsg) {
+            seatMsg.classList.remove("hidden");
+            seatMsg.textContent = "Pehle ek seat pakdo 😡";
+          }
+          return;
+        }
+        // show confirmation page and display who
+        const who = byId("who");
+        if (who) who.textContent = userName || "Maha-Yatri";
+        setStep("confirm");
+      });
+
+      // ——— Confirmation & fake 404 + timeout
+      byId("printBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        hide("confirm");
+        show("fake404");
+        // countdown then timeout
+        let n = 10;
+        const out = byId("redir");
+        const t = setInterval(() => {
+          out.textContent = String(n);
+          n--;
+          if (n < 0) {
+            clearInterval(t);
+            hide("fake404");
+            setStep("timeout");
+          }
+        }, 1000);
+      });
+
+      byId("finishBtn").addEventListener("click", () => {
+        // same flow as print: it never gives real ticket
+        hide("confirm");
+        show("fake404");
+        let n = 10;
+        const out = byId("redir");
+        const t = setInterval(() => {
+          out.textContent = String(n);
+          n--;
+          if (n < 0) {
+            clearInterval(t);
+            hide("fake404");
+            setStep("timeout");
+          }
+        }, 1000);
+      });
+
+      byId("restart").addEventListener("click", () => {
+        // reset minimal state
+        toTries = 0;
+        const toEl = byId("to");
+        if (toEl) toEl.value = "";
+        const nameEl = byId("name");
+        if (nameEl) nameEl.value = "";
+        document
+          .querySelectorAll('input[type="radio"]')
+          .forEach((r) => (r.checked = false));
+        hide("progressArea");
+        const b = byId("bar");
+        if (b) b.style.width = "0%";
+        const tr = byId("train");
+        if (tr) tr.style.left = "0";
+        // reset seats grid
+        chosenSeat = null;
+        if (seatMsg) {
+          seatMsg.classList.add("hidden");
+          seatMsg.textContent = "";
+        }
+        // rebuild seat grid (quick reset)
+        if (grid) {
+          grid.innerHTML = "";
+          seats.forEach((s) => {
+            const d = document.createElement("div");
+            d.textContent = s.label;
+            d.className = "seat " + s.cls;
+            d.onclick = () => {
+              /* same handler won't be reattached here for brevity; reload resets fully */
+            };
+            grid.appendChild(d);
+          });
+        }
+        setStep("home");
+      });
+
+      // start at home
+      setStep("home");
+    </script>
+  </body>
 </html>
